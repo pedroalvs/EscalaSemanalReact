@@ -1,0 +1,34 @@
+
+.logs-container {
+    max-width: 800px;
+    margin: auto;
+}
+
+.logs-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.logs-list li {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    padding: 10px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.log-time {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.log-action {
+    font-weight: bold;
+}
+
+.log-user {
+    font-style: italic;
+    color: #555;
+}
