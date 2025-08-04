@@ -1,25 +1,23 @@
-
 import ProgressBar from './ProgressBar';
 import '../styles/Summary.css';
 
-const weekDays = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
-const MAX_CAPACITY = 4;
-
 const Summary = ({ schedules }) => {
-    const getOccupancy = (dayOfWeek) => {
-        return schedules.filter(s => s.day_of_week === dayOfWeek).length;
+    const days = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
+    const maxCapacity = 4;
+
+    const getOcupationByDay = (dayIndex) => {
+        return schedules.filter(s => s.day_of_week === dayIndex + 1).length;
     };
 
     return (
         <div className="summary-container">
-            {weekDays.map((day, index) => {
-                const dayOfWeek = index + 1;
-                const occupancy = getOccupancy(dayOfWeek);
+            {days.map((day, index) => {
+                const ocupation = getOcupationByDay(index);
                 return (
-                    <div key={day} className="summary-card">
+                    <div key={day} className="summary-day-card">
                         <h3>{day}</h3>
-                        <p>{occupancy} / {MAX_CAPACITY}</p>
-                        <ProgressBar value={occupancy} max={MAX_CAPACITY} />
+                        <p className="ocupation-text">{ocupation} / {maxCapacity}</p>
+                        <ProgressBar value={ocupation} max={maxCapacity} />
                     </div>
                 );
             })}

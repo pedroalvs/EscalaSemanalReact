@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
@@ -8,21 +7,34 @@ import Profile from './pages/Profile';
 import Logs from './pages/Logs';
 import Settings from './pages/Settings';
 import Navbar from './components/Navbar';
+import './styles/App.css'; // Adicionado: Importa estilos globais para App
 
 function App() {
     const [session, setSession] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        // Busca a sessão ativa ao carregar a aplicação
+        const getSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
             setSession(session);
-        });
+            setLoading(false);
+        };
 
+        getSession();
+
+        // Escuta por mudanças no estado de autenticação (login/logout)
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);
         });
 
+        // Limpa a inscrição ao desmontar o componente
         return () => subscription.unsubscribe();
     }, []);
+
+    if (loading) {
+        return <div>Carregando...</div>; // Ou um componente de spinner
+    }
 
     return (
         <Router>

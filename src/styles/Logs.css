@@ -1,34 +1,30 @@
-
 .logs-container {
-    max-width: 800px;
-    margin: auto;
+    padding: 20px;
 }
 
 .logs-list {
     list-style-type: none;
     padding: 0;
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
-.logs-list li {
-    background-color: #f9f9f9;
-    border: 1px solid #eee;
-    padding: 10px;
-    margin-bottom: 5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.log-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
 }
 
-.log-time {
-    font-size: 0.9em;
-    color: #666;
+.log-item:last-child {
+    border-bottom: none;
+}
+
+.log-timestamp {
+    font-weight: bold;
+    margin-right: 15px;
+    color: #555;
 }
 
 .log-action {
-    font-weight: bold;
-}
-
-.log-user {
-    font-style: italic;
-    color: #555;
+    color: #333;
 }

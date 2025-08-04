@@ -1,11 +1,23 @@
-
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import '../styles/Navbar.css';
 
 const Navbar = () => {
+    const navigate = useNavigate();
+
     const handleLogout = async () => {
-        await supabase.auth.signOut();
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                console.error('Erro ao fazer logout:', error.message);
+                alert('Não foi possível fazer logout: ' + error.message);
+            } else {
+                navigate('/login');
+            }
+        } catch (error) {
+            console.error('Erro inesperado ao fazer logout:', error.message);
+            alert('Ocorreu um erro inesperado ao fazer logout.');
+        }
     };
 
     return (
@@ -15,9 +27,11 @@ const Navbar = () => {
             </div>
             <div className="navbar-links">
                 <Link to="/">Dashboard</Link>
-                <Link to="/settings">Dias Fixos</Link>
-                <Link to="/logs">Logs</Link>
                 <Link to="/profile">Perfil</Link>
+                <Link to="/settings">Agendamento Fixo</Link>
+                <Link to="/logs">Logs</Link>
+            </div>
+            <div className="navbar-actions">
                 <button onClick={handleLogout}>Sair</button>
             </div>
         </nav>

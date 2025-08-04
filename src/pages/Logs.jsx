@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import '../styles/Logs.css';
@@ -13,13 +12,14 @@ const Logs = () => {
                 setLoading(true);
                 const { data, error } = await supabase
                     .from('schedule_logs')
-                    .select('*')
-                    .order('created_at', { ascending: false });
+                    .select('created_at, user_display_name, action')
+                    .order('created_at', { ascending: false })
+                    .limit(100); // Limita a 100 logs para não sobrecarregar
 
                 if (error) throw error;
                 setLogs(data);
             } catch (error) {
-                console.error('Error fetching logs:', error.message);
+                alert(error.message);
             } finally {
                 setLoading(false);
             }
@@ -28,19 +28,16 @@ const Logs = () => {
         fetchLogs();
     }, []);
 
-    if (loading) {
-        return <div>Carregando logs...</div>;
-    }
+    if (loading) return <div>Carregando logs...</div>;
 
     return (
         <div className="logs-container">
             <h2>Logs de Auditoria</h2>
             <ul className="logs-list">
-                {logs.map(log => (
-                    <li key={log.id}>
-                        <span className="log-time">{new Date(log.created_at).toLocaleString()}</span>
+                {logs.map((log, index) => (
+                    <li key={index} className="log-item">
+                        <span className="log-timestamp">{new Date(log.created_at).toLocaleString('pt-BR')}</span>
                         <span className="log-action">{log.action}</span>
-                        <span className="log-user">por {log.user_display_name}</span>
                     </li>
                 ))}
             </ul>

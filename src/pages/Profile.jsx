@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 
@@ -10,7 +9,7 @@ const Profile = ({ session }) => {
         const getProfile = async () => {
             try {
                 setLoading(true);
-                const { user } = session;
+                const { user } = session || {};
 
                 const { data, error, status } = await supabase
                     .from('profiles')
@@ -37,7 +36,6 @@ const Profile = ({ session }) => {
 
     const updateProfile = async (e) => {
         e.preventDefault();
-
         try {
             setLoading(true);
             const { user } = session;
@@ -62,7 +60,7 @@ const Profile = ({ session }) => {
     };
 
     return (
-        <div className="form-widget">
+        <div className="profile-container">
             <h2>Meu Perfil</h2>
             <form onSubmit={updateProfile}>
                 <div>
@@ -78,10 +76,9 @@ const Profile = ({ session }) => {
                         onChange={(e) => setDisplayName(e.target.value)}
                     />
                 </div>
-
                 <div>
-                    <button className="button-primary" type="submit" disabled={loading}>
-                        {loading ? 'Salvando ...' : 'Salvar'}
+                    <button className="button primary block" disabled={loading}>
+                        {loading ? 'Salvando...' : 'Salvar'}
                     </button>
                 </div>
             </form>

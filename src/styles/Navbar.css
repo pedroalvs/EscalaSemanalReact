@@ -1,31 +1,38 @@
-
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 2rem;
+    padding: 10px 20px;
     background-color: #333;
     color: white;
-    margin-bottom: 2rem;
 }
 
 .navbar-brand a {
     color: white;
     text-decoration: none;
     font-weight: bold;
-    font-size: 1.5rem;
+    font-size: 1.2em;
 }
 
-.navbar-links a, .navbar-links button {
+.navbar-links a {
     color: white;
     text-decoration: none;
-    margin-left: 1rem;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
+    margin: 0 15px;
 }
 
-.navbar-links a:hover, .navbar-links button:hover {
+.navbar-links a:hover {
     text-decoration: underline;
+}
+
+.navbar-actions button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.navbar-actions button:hover {
+    background-color: #d32f2f;
 }

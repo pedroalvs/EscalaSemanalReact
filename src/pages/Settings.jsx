@@ -1,86 +1,84 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 
-const weekDays = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
-
 const Settings = ({ session }) => {
-    const [persistentSchedules, setPersistentSchedules] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [persistentSchedule, setPersistentSchedule] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const daysOfWeek = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 
     useEffect(() => {
-        const fetchPersistentSchedules = async () => {
+        const fetchPersistentSchedule = async () => {
             try {
                 setLoading(true);
+                const { user } = session || {};
+                if (!user) return; // Exit if user is not available
+
                 const { data, error } = await supabase
                     .from('persistent_schedules')
                     .select('day_of_week')
-                    .eq('user_id', session.user.id);
+                    .eq('user_id', user.id);
 
                 if (error) throw error;
-                setPersistentSchedules(data.map(item => item.day_of_week));
+                setPersistentSchedule(data.map(item => item.day_of_week));
             } catch (error) {
-                console.error('Error fetching persistent schedules:', error.message);
+                alert(error.message);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchPersistentSchedules();
-    }, [session.user.id]);
+        fetchPersistentSchedule();
+    }, [session?.user?.id]);
 
-    const handleCheckboxChange = async (dayOfWeek, isChecked) => {
-        if (isChecked) {
-            // Adicionar dia fixo
-            const { error } = await supabase
-                .from('persistent_schedules')
-                .insert({ user_id: session.user.id, day_of_week: dayOfWeek });
-            if (error) {
-                console.error('Error saving persistent schedule:', error.message);
+    const handleCheckboxChange = async (dayIndex, isChecked) => {
+        const day = dayIndex + 1;
+        let newSchedule = [...persistentSchedule];
+
+        try {
+            if (isChecked) {
+                // Adicionar dia fixo
+                newSchedule.push(day);
+                const { error } = await supabase.from('persistent_schedules').insert({ 
+                    user_id: session.user.id, 
+                    day_of_week: day 
+                });
+                if (error) throw error;
             } else {
-                setPersistentSchedules([...persistentSchedules, dayOfWeek]);
+                // Remover dia fixo
+                newSchedule = newSchedule.filter(d => d !== day);
+                const { error } = await supabase.from('persistent_schedules').delete().match({ 
+                    user_id: session.user.id, 
+                    day_of_week: day 
+                });
+                if (error) throw error;
             }
-        } else {
-            // Remover dia fixo
-            const { error } = await supabase
-                .from('persistent_schedules')
-                .delete()
-                .match({ user_id: session.user.id, day_of_week: dayOfWeek });
-            if (error) {
-                console.error('Error deleting persistent schedule:', error.message);
-            } else {
-                setPersistentSchedules(persistentSchedules.filter(d => d !== dayOfWeek));
-            }
+            setPersistentSchedule(newSchedule);
+        } catch (error) {
+            alert('Erro ao salvar agendamento fixo: ' + error.message);
+            // Reverte a mudança visual em caso de erro
+            setPersistentSchedule(persistentSchedule);
         }
     };
 
-    if (loading) {
-        return <div>Carregando configurações...</div>;
-    }
-
     return (
-        <div>
-            <h2>Configurar Dias Fixos</h2>
+        <div className="settings-container">
+            <h2>Configurações de Agendamento Fixo</h2>
             <p>Marque os dias que você deseja que sejam agendados automaticamente toda semana.</p>
             <div className="persistent-schedule-form">
-                {weekDays.map((day, index) => {
-                    const dayOfWeek = index + 1;
-                    return (
-                        <div key={day}>
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={persistentSchedules.includes(dayOfWeek)}
-                                    onChange={(e) => handleCheckboxChange(dayOfWeek, e.target.checked)}
-                                />
-                                {day}
-                            </label>
-                        </div>
-                    );
-                })}
+                {daysOfWeek.map((day, index) => (
+                    <div key={index} className="checkbox-item">
+                        <input 
+                            type="checkbox"
+                            id={`day-${index}`}
+                            checked={persistentSchedule.includes(index + 1)}
+                            onChange={(e) => handleCheckboxChange(index, e.target.checked)}
+                        />
+                        <label htmlFor={`day-${index}`}>{day}</label>
+                    </div>
+                ))}
             </div>
-            <div style={{ marginTop: '20px', fontStyle: 'italic' }}>
-                <strong>Nota:</strong> A lógica para popular a escala semanal a partir dos seus dias fixos precisa ser implementada via uma Supabase Edge Function que rode periodicamente (ex: todo domingo).
+            <div className="info-box">
+                <strong>Nota:</strong> A lógica para aplicar estes dias fixos a cada nova semana precisa ser executada por uma função automatizada (Supabase Edge Function) no início de cada semana.
             </div>
         </div>
     );
